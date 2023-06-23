@@ -9,11 +9,11 @@ const app = express();
 app.use(cors());
 
 const userRoute=require('./routes/user');
- 
+  
 app.use(bodyParser.json({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(userRoute);
+app.use('/user',userRoute);
 
 app.use(errorController.get404);
 

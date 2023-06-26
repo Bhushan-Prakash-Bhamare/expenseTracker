@@ -1,6 +1,8 @@
 const exForm=document.getElementById('expform');
 const displayList=document.querySelector('.list-group');
 exForm.addEventListener('submit',formSubmit);
+const razorButton=document.getElementById('razorbtn');
+razorButton.addEventListener('click',paymentfunc);
  
 async function formSubmit(e)
 {   try{
@@ -26,6 +28,10 @@ async function formSubmit(e)
 window.addEventListener("DOMContentLoaded",async()=>{
    try{
     const token=localStorage.getItem('token');
+    const Data=await axios.get("http://localhost:3100/user",{ headers:{"Authorization":token}})
+    if(Data.data.userData.ispremiumuser==true){
+        razorButton.parentNode.removeChild(razorButton);
+    }
     const response=await axios.get("http://localhost:3100/expense",{ headers:{"Authorization":token}})
     for(var i=0;i<response.data.expenseData.length;i++)
         showExp(response.data.expenseData[i]);
@@ -65,4 +71,33 @@ async function showExp(myobj)
     catch(error){
         console.log(error)
     };
+}
+
+async function paymentfunc(e){
+    const token=localStorage.getItem('token');
+    const response=await axios.get(`http://localhost:3100/purchase/premiummembership`,{headers:{"Authorization":token}});
+    var options={
+        "key":response.data.key_id,
+        "order_id":response.data.order.id,
+        "handler":async function(response){
+            await axios.post(`http://localhost:3100/purchase/updatetrstatus`,{
+            order_id:options.order_id,
+            payment_id:response.razorpay_payment_id},
+            {headers:{"Authorization":token}})
+            alert('You are a Premium User Now');
+            razorButton.parentNode.removeChild(razorButton);
+        }
+    };
+    const rzp1=new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+
+    rzp1.on('payment.failed',async function(response){
+            await axios.post(`http://localhost:3100/purchase/updatetrstatus`,{
+            order_id:options.order_id,
+            payment_id:response.razorpay_payment_id},
+            {headers:{"Authorization":token}})
+            alert('Something went wrong');
+    })
+
 }

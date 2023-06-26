@@ -73,3 +73,13 @@ exports.login=async(req,res,next)=>{
         res.status(500).json({message:err,success:false,});
     }
 }
+
+exports.getuser=async(req,res,next)=>{
+    try{
+        const data=await userModel.findByPk(req.user.id);
+        res.status(201).json({userData:data,success:true});
+    }
+    catch(err){ 
+        res.status(500).json({error:err,success:false});
+    }
+}

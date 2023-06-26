@@ -2,9 +2,6 @@ const { where } = require('sequelize');
 const expenseModel=require('../models/expense');
 const jwt=require('jsonwebtoken');
 
-function generateAcToken(id){
-    return jwt.sign({userid:id},'qR8v3cJkiPMkTyqnTpmHnjDVGHsl1kE1')
-}
 
 function isstringinvalid(string){
     if(string==undefined||string.length==0){

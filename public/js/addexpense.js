@@ -1,8 +1,14 @@
 const exForm=document.getElementById('expform');
 const displayList=document.querySelector('.list-group');
-exForm.addEventListener('submit',formSubmit);
 const razorButton=document.getElementById('razorbtn');
+const preUser=document.getElementById('premiumuser');
+const lBoardbutton=document.getElementById('lBoard');
+const leaderBoard=document.getElementById('Leaderboard');
+
+exForm.addEventListener('submit',formSubmit);
 razorButton.addEventListener('click',paymentfunc);
+lBoardbutton.addEventListener('click',showleaderBoard);
+
  
 async function formSubmit(e)
 {   try{
@@ -30,7 +36,10 @@ window.addEventListener("DOMContentLoaded",async()=>{
     const token=localStorage.getItem('token');
     const Data=await axios.get("http://localhost:3100/user",{ headers:{"Authorization":token}})
     if(Data.data.userData.ispremiumuser==true){
-        razorButton.parentNode.removeChild(razorButton);
+        preUser.style.display='block';
+    }
+    else{
+        razorButton.style.display='block';
     }
     const response=await axios.get("http://localhost:3100/expense",{ headers:{"Authorization":token}})
     for(var i=0;i<response.data.expenseData.length;i++)
@@ -85,7 +94,7 @@ async function paymentfunc(e){
             payment_id:response.razorpay_payment_id},
             {headers:{"Authorization":token}})
             alert('You are a Premium User Now');
-            razorButton.parentNode.removeChild(razorButton);
+            preUser.style.display='block';
         }
     };
     const rzp1=new Razorpay(options);
@@ -100,4 +109,19 @@ async function paymentfunc(e){
             alert('Something went wrong');
     })
 
+}
+
+var clicked=true;
+async function showleaderBoard(){
+    if(clicked){
+        clicked=false;
+        const token=localStorage.getItem('token');
+        const lbArray=await axios.get(`http://localhost:3100/premium/showleaderboard`,{headers:{"Authorization":token}})
+        leaderBoard.innerHTML += '<h1> Leader Board</h1>';
+        var count=1;
+        lbArray.data.forEach(user => {
+        leaderBoard.innerHTML += `<li class='list-group-item'>${count++}. Name - ${user.name} &nbsp&nbsp&nbsp Total Expenses - ${user.expense}</li>`
+    });
+    }
+    
 }

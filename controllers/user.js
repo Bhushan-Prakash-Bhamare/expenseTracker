@@ -2,8 +2,8 @@ const userModel=require('../models/user');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 
-function generateAcToken(id){
-    return jwt.sign({userId:id},'qR8v3cJkiPMkTyqnTpmHnjDVGHsl1kE1')
+function generateAcToken(id,name,ispremiumuser){
+    return jwt.sign({userId:id,name:name,ispremiumuser},'qR8v3cJkiPMkTyqnTpmHnjDVGHsl1kE1')
 }
 
 function isstringinvalid(string){
@@ -57,7 +57,7 @@ exports.login=async(req,res,next)=>{
                 }
                 if(result===true)
                 {
-                    return res.status(201).json({success:true,message:'Login successfull',token:generateAcToken(allData[0].id)});
+                    return res.status(201).json({success:true,message:'Login successfull',token:generateAcToken(allData[0].id,allData[0].name,allData[0].ispremiumuser)});
                 }
                 else
                 {

@@ -9,7 +9,36 @@ exForm.addEventListener('submit',formSubmit);
 razorButton.addEventListener('click',paymentfunc);
 lBoardbutton.addEventListener('click',showleaderBoard);
 
- 
+function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+window.addEventListener("DOMContentLoaded",async()=>{
+    try{
+     const token=localStorage.getItem('token');
+     const decodedtoken=parseJwt (token);
+     const ispremiumuser=decodedtoken.ispremiumuser;
+     if(ispremiumuser){
+         preUser.style.display='block';
+     }
+     else{
+         razorButton.style.display='block';
+     }
+     const response=await axios.get("http://localhost:3100/expense",{ headers:{"Authorization":token}})
+     for(var i=0;i<response.data.expenseData.length;i++)
+         showExp(response.data.expenseData[i]);
+     }
+     catch(error){
+         console.log(error)
+     };
+ })
+
 async function formSubmit(e)
 {   try{
     e.preventDefault();
@@ -30,25 +59,6 @@ async function formSubmit(e)
         console.log(err)
     };   
 }
-
-window.addEventListener("DOMContentLoaded",async()=>{
-   try{
-    const token=localStorage.getItem('token');
-    const Data=await axios.get("http://localhost:3100/user",{ headers:{"Authorization":token}})
-    if(Data.data.userData.ispremiumuser==true){
-        preUser.style.display='block';
-    }
-    else{
-        razorButton.style.display='block';
-    }
-    const response=await axios.get("http://localhost:3100/expense",{ headers:{"Authorization":token}})
-    for(var i=0;i<response.data.expenseData.length;i++)
-        showExp(response.data.expenseData[i]);
-    }
-    catch(error){
-        console.log(error)
-    };
-})
 
 async function showExp(myobj)
 {
@@ -89,12 +99,15 @@ async function paymentfunc(e){
         "key":response.data.key_id,
         "order_id":response.data.order.id,
         "handler":async function(response){
-            await axios.post(`http://localhost:3100/purchase/updatetrstatus`,{
+           const res= await axios.post(`http://localhost:3100/purchase/updatetrstatus`,{
             order_id:options.order_id,
             payment_id:response.razorpay_payment_id},
             {headers:{"Authorization":token}})
+            console.log(res);
             alert('You are a Premium User Now');
             preUser.style.display='block';
+            razorButton.style.display='none';
+            localStorage.setItem('token',res.data.token);
         }
     };
     const rzp1=new Razorpay(options);
@@ -120,7 +133,7 @@ async function showleaderBoard(){
         leaderBoard.innerHTML += '<h1> Leader Board</h1>';
         var count=1;
         lbArray.data.forEach(user => {
-        leaderBoard.innerHTML += `<li class='list-group-item'>${count++}. Name - ${user.name} &nbsp&nbsp&nbsp Total Expenses - ${user.expense}</li>`
+        leaderBoard.innerHTML += `<li class='list-group-item'>${count++}. Name - ${user.name} &nbsp&nbsp&nbsp Total Expenses - ${user.totalexpense}</li>`
     });
     }
     

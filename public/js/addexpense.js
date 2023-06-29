@@ -4,10 +4,12 @@ const razorButton=document.getElementById('razorbtn');
 const preUser=document.getElementById('premiumuser');
 const lBoardbutton=document.getElementById('lBoard');
 const leaderBoard=document.getElementById('Leaderboard');
+const downloadbtn=document.getElementById('Downbtn');
 
 exForm.addEventListener('submit',formSubmit);
 razorButton.addEventListener('click',paymentfunc);
 lBoardbutton.addEventListener('click',showleaderBoard);
+downloadbtn.addEventListener('click',download);
 
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
@@ -72,7 +74,7 @@ async function showExp(myobj)
     deletebtn.className='btn btn-danger btn-sm float-end delete'
     deletebtn.appendChild(document.createTextNode('Delete'));
     addNewelem.appendChild(deletebtn);
-
+ 
     displayList.appendChild(addNewelem);
 
     deletebtn.addEventListener('click',async function(){
@@ -137,4 +139,24 @@ async function showleaderBoard(){
     });
     }
     
+}
+
+async function download(){
+    try{
+        const response=await axios.get('http://localhost:3000/user/download', { headers: {"Authorization" : token} });
+        if(response.status === 201){
+            //the bcakend is essentially sending a download link
+            //  which if we open in browser, the file would download
+            var a = document.createElement("a");
+            a.href = response.data.fileUrl;
+            a.download = 'myexpense.csv';
+            a.click();
+        } else {
+            throw new Error(response.data.message)
+        }
+    }
+    catch(err){
+        console.log(err);
+        document.body.innerHTML += `<div style="color:red;"> ${err}</div>`
+    }
 }

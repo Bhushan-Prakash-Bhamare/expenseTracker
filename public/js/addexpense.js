@@ -1,10 +1,12 @@
 const exForm=document.getElementById('expform');
 const displayList=document.querySelector('.list-group');
-const razorButton=document.getElementById('razorbtn');
+const nonpreuser=document.getElementById('nonpremiumuser');
 const preUser=document.getElementById('premiumuser');
+const razorButton=document.getElementById('razorbtn');
 const lBoardbutton=document.getElementById('lBoard');
 const leaderBoard=document.getElementById('Leaderboard');
 const downloadbtn=document.getElementById('Downbtn');
+const historyList=document.getElementById('urlhistory');
 
 exForm.addEventListener('submit',formSubmit);
 razorButton.addEventListener('click',paymentfunc);
@@ -30,11 +32,15 @@ window.addEventListener("DOMContentLoaded",async()=>{
          preUser.style.display='block';
      }
      else{
-         razorButton.style.display='block';
+        nonpreuser.style.display='block';
      }
      const response=await axios.get("http://localhost:3100/expense",{ headers:{"Authorization":token}})
      for(var i=0;i<response.data.expenseData.length;i++)
          showExp(response.data.expenseData[i]);
+
+    const history=await axios.get("http://localhost:3100/user/dhistory",{ headers:{"Authorization":token}})
+    for(var i=0;i<history.data.downloadData.length;i++)
+        showhistory(history.data.downloadData[i]);
      }
      catch(error){
          console.log(error)
@@ -93,6 +99,21 @@ async function showExp(myobj)
         console.log(error)
     };
 }
+var count=1;
+async function showhistory(myobj)
+{
+    try{
+       
+        const addNewelem=document.createElement('li');
+        addNewelem.className=" text-truncate list-group-item bg-light";
+        const text=document.createTextNode(count++ +"."+myobj.url+"-"+myobj.createdAt);
+        addNewelem.appendChild(text);
+        historyList.appendChild(addNewelem);
+    }
+    catch(error){
+        console.log(error)
+    };
+}
 
 async function paymentfunc(e){
     const token=localStorage.getItem('token');
@@ -108,7 +129,7 @@ async function paymentfunc(e){
             console.log(res);
             alert('You are a Premium User Now');
             preUser.style.display='block';
-            razorButton.style.display='none';
+            nonpreuser.style.display='none';
             localStorage.setItem('token',res.data.token);
         }
     };
@@ -143,12 +164,12 @@ async function showleaderBoard(){
 
 async function download(){
     try{
-        const response=await axios.get('http://localhost:3000/user/download', { headers: {"Authorization" : token} });
-        if(response.status === 201){
-            //the bcakend is essentially sending a download link
-            //  which if we open in browser, the file would download
+        console.log('clicked dload');
+        const token=localStorage.getItem('token');
+        const response=await axios.get('http://localhost:3100/user/download', { headers: {"Authorization" : token} });
+        if(response.status === 200){
             var a = document.createElement("a");
-            a.href = response.data.fileUrl;
+            a.href = response.data.fileURL;
             a.download = 'myexpense.csv';
             a.click();
         } else {

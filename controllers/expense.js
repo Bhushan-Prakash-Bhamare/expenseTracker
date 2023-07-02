@@ -13,13 +13,15 @@ function isstringinvalid(string){
 exports.getAllExpense=async(req, res, next)=>{
     try{
         const page= +req.query.page||1;
-        const ITEMS_PER_PAGE=10;
-        const totalitems=await expenseModel.count();
+        const ITEMS_PER_PAGE= +req.query.size;
+        console.log(page,ITEMS_PER_PAGE);
+        const totalitems=await expenseModel.count({where:{userId:req.user.id}});
         const data=await expenseModel.findAll({
             offset:(page-1) * ITEMS_PER_PAGE,
             limit:ITEMS_PER_PAGE,
             where:{userId:req.user.id}});
         res.status(201).json({
+            size:ITEMS_PER_PAGE,
             expenseData:data,
             currentPage:page,
             hasNextPage:ITEMS_PER_PAGE * page<totalitems,

@@ -1,6 +1,5 @@
 const expenseModel=require('../models/expense');
 const userModel=require('../models/user');
-const jwt=require('jsonwebtoken');
 const sequelize = require('../util/database');
 
 
@@ -13,13 +12,27 @@ function isstringinvalid(string){
 
 exports.getAllExpense=async(req, res, next)=>{
     try{
-        const data=await expenseModel.findAll({where:{userId:req.user.id}});
-        res.status(201).json({expenseData:data,success:true});
+        const page= +req.query.page||1;
+        const ITEMS_PER_PAGE=10;
+        const totalitems=await expenseModel.count();
+        const data=await expenseModel.findAll({
+            offset:(page-1) * ITEMS_PER_PAGE,
+            limit:ITEMS_PER_PAGE,
+            where:{userId:req.user.id}});
+        res.status(201).json({
+            expenseData:data,
+            currentPage:page,
+            hasNextPage:ITEMS_PER_PAGE * page<totalitems,
+            nextPage:page+1,
+            hasPreviousPage:page>1,
+            previousPage:page-1,
+            lastPage:Math.ceil(totalitems/ITEMS_PER_PAGE)
+            });
     }
     catch(err){ 
         res.status(500).json({error:err,success:false});
     }   
-};
+}; 
 
 exports.postAddExpense=async(req, res, next)=>{
     try{ 
@@ -36,7 +49,7 @@ exports.postAddExpense=async(req, res, next)=>{
         await t.commit();
         res.status(201).json({newExpenseData:data,success:true,});
     }
-    catch(err){
+    catch(err){ 
         await t.rollback();
         console.log(err); 
         res.status(500).json({error:err,success:false});

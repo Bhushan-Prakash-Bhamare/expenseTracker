@@ -7,6 +7,7 @@ const lBoardbutton=document.getElementById('lBoard');
 const leaderBoard=document.getElementById('Leaderboard');
 const downloadbtn=document.getElementById('Downbtn');
 const historyList=document.getElementById('urlhistory');
+const pagination=document.getElementById('page');
 
 exForm.addEventListener('submit',formSubmit);
 razorButton.addEventListener('click',paymentfunc);
@@ -30,13 +31,16 @@ window.addEventListener("DOMContentLoaded",async()=>{
      const ispremiumuser=decodedtoken.ispremiumuser;
      if(ispremiumuser){
          preUser.style.display='block';
+         historyList.style.display='block';
      }
      else{
         nonpreuser.style.display='block';
      }
-     const response=await axios.get("http://localhost:3100/expense",{ headers:{"Authorization":token}})
+     const page=1;
+     const response=await axios.get(`http://localhost:3100/expense?page=${page}`,{ headers:{"Authorization":token}})
      for(var i=0;i<response.data.expenseData.length;i++)
          showExp(response.data.expenseData[i]);
+         showpagination(response.data);
 
     const history=await axios.get("http://localhost:3100/user/dhistory",{ headers:{"Authorization":token}})
     for(var i=0;i<history.data.downloadData.length;i++)
@@ -129,6 +133,7 @@ async function paymentfunc(e){
             console.log(res);
             alert('You are a Premium User Now');
             preUser.style.display='block';
+            historyList.style.display='block';
             nonpreuser.style.display='none';
             localStorage.setItem('token',res.data.token);
         }
@@ -164,7 +169,7 @@ async function showleaderBoard(){
 
 async function download(){
     try{
-        console.log('clicked dload');
+        
         const token=localStorage.getItem('token');
         const response=await axios.get('http://localhost:3100/user/download', { headers: {"Authorization" : token} });
         if(response.status === 200){
@@ -178,6 +183,50 @@ async function download(){
     }
     catch(err){
         console.log(err);
-        document.body.innerHTML += `<div style="color:red;"> ${err}</div>`
+        exForm.innerHTML += `<div style="color:red;"> ${err}</div>`
     }
 }
+
+function showpagination({
+    currentPage,
+    hasNextPage,
+    nextPage,
+    hasPreviousPage,
+    previousPage,
+    lastPage
+}){
+
+    pagination.innerHTML='';
+
+    if(hasPreviousPage){
+        const btn2=document.createElement('button');
+        btn2.innerHTML=previousPage;
+        btn2.addEventListener('click',()=>{getExpenses(previousPage)});
+        pagination.appendChild(btn2);
+    }
+    const btn1=document.createElement('button');
+        btn1.innerHTML=`<h3>${currentPage}</h3>`;
+        btn1.addEventListener('click',()=>{getExpenses(currentPage)});
+        pagination.appendChild(btn1);
+
+    if(hasNextPage){
+        const btn3=document.createElement('button');
+        btn3.innerHTML=nextPage;
+        btn3.addEventListener('click',()=>{getExpenses(nextPage)});
+        pagination.appendChild(btn3);
+        }    
+}
+
+async function getExpenses(page)
+{
+    try{
+        const token=localStorage.getItem('token');
+        const response=await axios.get(`http://localhost:3100/expense?page=${page}`,{ headers:{"Authorization":token}})
+        for(var i=0;i<response.data.expenseData.length;i++)
+         showExp(response.data.expenseData[i]);
+         showpagination(response.data);
+    }
+    catch(error){
+        console.log(error);
+    }
+} 

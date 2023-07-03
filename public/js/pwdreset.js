@@ -38,8 +38,8 @@ async function formSubmit(e){
         throw new Error('password and confirm password does not match');
       }  
   }
-  catch(err){ 
+  catch(err){  
       console.log(err.message);
-      document.body.innerHTML +=`<div style="color:red;">${err.message}</div>`;
+      form.innerHTML +=`<div style="color:red;">${err.message}</div>`;
   }
 }

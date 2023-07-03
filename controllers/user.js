@@ -119,6 +119,11 @@ function uploadToS3(data,filename){
 
 exports.download=async(req,res,next)=>{
     try{
+        const premium=req.user.ispremiumuser;
+        if(!premium)
+        {
+           return res.status(401).json({success:false});
+        }
         const expenses=await req.user.getExpenses();
         const StrExpenses=JSON.stringify(expenses);
         const userId=req.user.id;

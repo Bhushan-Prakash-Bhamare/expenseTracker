@@ -10,7 +10,7 @@
   "author": "Bhushan Bhamare",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1409.0",
+    "aws-sdk": "^2.1409.0", 
     "axios": "^1.4.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.2",

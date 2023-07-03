@@ -1,18 +1,18 @@
-const Razorpay=require('razorpay');
+const Razorpay=require('razorpay')
 const order=require('../models/order');
 const jwt=require('jsonwebtoken');
 require('dotenv').config();
 
 function generateAcToken(id,name,ispremiumuser){
-    return jwt.sign({userId:id,name:name,ispremiumuser},'qR8v3cJkiPMkTyqnTpmHnjDVGHsl1kE1')
+    return jwt.sign({userId:id,name:name,ispremiumuser},process.env.TOKEN_SECRET);
 }
 
 exports.purchasepremium=async(req,res,next)=>{
     try{
         var rzp=new Razorpay({
-            key_id:"rzp_test_bu5sDCKdqpR1gO",
-            key_secret:"lrZBN7FyWFVn3aqhHnq2iNSi"
-        })
+            key_id:process.env.RAZORPAY_KEY_ID,
+            key_secret:process.env.RAZORPAY_KEY_SECRET
+        })   
         const amount=2500;
 
         rzp.orders.create({amount,currency:"INR"},async(err,order)=>{

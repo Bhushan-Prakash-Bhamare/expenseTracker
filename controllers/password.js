@@ -18,7 +18,7 @@ exports.passwordresetmail=async(req, res, next)=>{
                 'email':`${req.body.email}`
             }],
             'subject':'Reset password of expense app',
-            'textContent':`password reset link: http://localhost:3100/password/resetpassword/${uId}`
+            'textContent':`password reset link: http://13.51.204.19:3100/password/resetpassword/${uId}`
         })
         const user=await userModel.findOne({where:{email:req.body.email}});
         await forgetpwdModel.create({id:uId,userId:user.id});

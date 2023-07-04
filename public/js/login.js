@@ -27,7 +27,7 @@ async function formSubmit(e){
           password:e.target.password.value
       }
       
-      const response=await axios.post(`http://localhost:3100/user/login`,details);  
+      const response=await axios.post(`http://13.51.204.19:3100/user/login`,details);  
           console.log(response.data.message); 
           localStorage.setItem('token',response.data.token);
           window.location.href = "http://127.0.0.1:5500/views/addexpense.html";  

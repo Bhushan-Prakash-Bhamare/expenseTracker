@@ -9,7 +9,7 @@ async function sendmail(e){
         const details={
             email:e.target.email.value
         }
-        const response=await axios.post(`http://localhost:3100/password/forgotpassword`,details); 
+        const response=await axios.post(`http://13.51.204.19:3100/password/forgotpassword`,details); 
         console.log(response); 
     }   
     catch(err){

@@ -3,6 +3,7 @@ const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const errorController = require('./controllers/error');
+require('dotenv').config();
 const sequelize=require('./util/database');
 const helmet=require('helmet');
 const morgan=require('morgan');

@@ -30,7 +30,7 @@ async function formSubmit(e){
       const response=await axios.post(`http://13.51.204.19:3100/user/login`,details);  
           console.log(response.data.message); 
           localStorage.setItem('token',response.data.token);
-          window.location.href = "../html/addexpense.htmlo";   
+          window.location.href = "../html/addexpense.html";   
       
   }
   catch(err){ 

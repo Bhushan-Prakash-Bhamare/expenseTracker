@@ -25,7 +25,7 @@ const app = express();
 
 const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'});
 
-app.use(helmet());
+app.use(helmet({contentSecurityPolicy: false})); 
 app.use(morgan('combined',{stream:accessLogStream}));
 
 app.use(cors());
@@ -40,8 +40,8 @@ app.use('/premium',premiumRoute);
 app.use('/password',passwordRoute); 
 
 app.use((req,res)=>{
-  //console.log()
-  res.sendFile(path.join(__dirname,`public/${req.url}`))
+  console.log('url',req.url);
+  res.sendFile(path.join(__dirname,`public/${req.url}`));
 });
 
 User.hasMany(Expense);

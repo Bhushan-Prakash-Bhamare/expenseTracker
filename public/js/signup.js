@@ -31,10 +31,9 @@ async function formSubmit(e){
         const response=await axios.post(`http://13.51.204.19:3100/user/signup`,details);
         if(response.status===201){
             console.log("success:User added"); 
-            window.location.href="http://127.0.0.1:5500/views/login.html" ; 
+            window.location.href="http://127.0.0.1:5500/public/html/login.html" ; 
         }
         else{
-
             throw new error('Something went wrong');
         }
     }

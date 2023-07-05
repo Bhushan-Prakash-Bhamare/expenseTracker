@@ -25,13 +25,13 @@ const app = express();
 
 const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'});
 
-app.use(helmet({contentSecurityPolicy: false})); 
+// app.use(helmet({contentSecurityPolicy: false})); 
 app.use(morgan('combined',{stream:accessLogStream}));
 
 app.use(cors());
   
 app.use(bodyParser.json({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/user',userRoute);
 app.use('/expense',expenseRoute);
@@ -40,7 +40,6 @@ app.use('/premium',premiumRoute);
 app.use('/password',passwordRoute); 
 
 app.use((req,res)=>{
-  console.log('url',req.url);
   res.sendFile(path.join(__dirname,`public/${req.url}`));
 });
 

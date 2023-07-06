@@ -25,7 +25,7 @@ const app = express();
 
 const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'});
 
-// app.use(helmet({contentSecurityPolicy: false})); 
+// app.use(helmet({contentSecurityPolicy: false}));  
 app.use(morgan('combined',{stream:accessLogStream}));
  
 app.use(cors());
